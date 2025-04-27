@@ -1,14 +1,20 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 import httpx
 from typing import Optional, Dict, List
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
-from config import get_available_models, get_system_message
+from config import (
+    get_available_models, 
+    get_system_message, 
+    get_lmstudio_base_url,
+    get_app_port
+)
 
 # LMStudio API configuration
-LMSTUDIO_BASE_URL = "http://localhost:1234"
+LMSTUDIO_BASE_URL = get_lmstudio_base_url()
 LMSTUDIO_CHAT_URL = f"{LMSTUDIO_BASE_URL}/v1/chat/completions"
 
 # Global http client
@@ -32,6 +38,15 @@ async def lifespan(app: FastAPI):
         await http_client.aclose()
 
 app = FastAPI(lifespan=lifespan)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can restrict this to specific domains if needed
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Mount static files and templates
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -100,4 +115,9 @@ async def chat(chat_request: ChatRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(
+        "main:app", 
+        host="0.0.0.0", 
+        port=get_app_port(), 
+        reload=True
+    )
