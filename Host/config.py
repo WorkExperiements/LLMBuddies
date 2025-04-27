@@ -5,8 +5,12 @@ MODEL_CONFIGS = {
 }
 
 # System message to shape the model's behavior
-SYSTEM_MESSAGE = """You are a helpful AI assistant. Please provide clear, concise, and accurate responses.
-Be friendly but professional in your interactions."""
+SYSTEM_MESSAGE = """You are a helpful AI assistant. """
+
+# Server configuration
+LMSTUDIO_HOST = "localhost"  # Change this to the IP address of the machine running LM Studio if needed
+LMSTUDIO_PORT = 1234
+APP_PORT = 8000
 
 def get_model_path(model_id: str) -> str:
     """Get the full path for a model ID"""
@@ -22,3 +26,11 @@ def get_available_models() -> dict:
 def get_system_message() -> str:
     """Get the system message for the chat"""
     return SYSTEM_MESSAGE
+
+def get_lmstudio_base_url() -> str:
+    """Get the base URL for LM Studio API"""
+    return f"http://{LMSTUDIO_HOST}:{LMSTUDIO_PORT}"
+
+def get_app_port() -> int:
+    """Get the port for the web application"""
+    return APP_PORT
