@@ -2,8 +2,22 @@
 let chatHistory = [];
 let currentSessionId = null;
 
-// Load available models when page loads
-document.addEventListener('DOMContentLoaded', loadAvailableModels);
+// Load available models and setup collapsible when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    loadAvailableModels();
+    setupCollapsible();
+});
+
+function setupCollapsible() {
+    const collapsibles = document.getElementsByClassName('collapsible');
+    for (let i = 0; i < collapsibles.length; i++) {
+        collapsibles[i].addEventListener('click', function() {
+            this.classList.toggle('collapsed');
+            const content = this.nextElementSibling;
+            content.classList.toggle('collapsed');
+        });
+    }
+}
 
 async function loadAvailableModels() {
     try {
@@ -20,7 +34,7 @@ async function loadAvailableModels() {
         for (const [modelId, modelInfo] of Object.entries(data)) {
             const option = document.createElement('option');
             option.value = modelId;
-            option.textContent = modelId;
+            option.textContent = modelInfo.display_name;
             modelSelect.appendChild(option);
         }
     } catch (error) {
