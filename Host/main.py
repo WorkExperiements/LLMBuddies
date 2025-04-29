@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -6,6 +6,9 @@ import httpx
 from typing import Optional, Dict, List
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
+from sqlalchemy.orm import Session
+from database import get_db, ChatSession
+import json
 from config import (
     get_available_models, 
     get_system_message, 
@@ -24,10 +27,14 @@ class ChatMessage(BaseModel):
     role: str
     content: str
 
+    def dict(self, *args, **kwargs):
+        return {"role": self.role, "content": self.content}
+
 class ChatRequest(BaseModel):
     message: str
     model_id: str
     history: List[ChatMessage]
+    session_id: Optional[str] = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -42,7 +49,7 @@ app = FastAPI(lifespan=lifespan)
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # You can restrict this to specific domains if needed
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -61,8 +68,16 @@ async def list_configured_models():
     """List all models from our configuration"""
     return get_available_models()
 
+@app.get("/chat/session/{session_id}")
+async def get_chat_session(session_id: str, db: Session = Depends(get_db)):
+    """Get chat history for a session"""
+    session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
+    if not session:
+        return {"history": []}
+    return {"history": session.history}
+
 @app.post("/chat")
-async def chat(chat_request: ChatRequest):
+async def chat(chat_request: ChatRequest, db: Session = Depends(get_db)):
     try:
         if not chat_request.message.strip():
             raise HTTPException(status_code=400, detail="Message cannot be empty")
@@ -74,7 +89,7 @@ async def chat(chat_request: ChatRequest):
         messages = [{"role": "system", "content": get_system_message()}]
         
         # Add conversation history
-        messages.extend([{"role": msg.role, "content": msg.content} for msg in chat_request.history])
+        messages.extend([msg.dict() for msg in chat_request.history])
         
         # Add new message
         messages.append({"role": "user", "content": chat_request.message})
@@ -92,7 +107,7 @@ async def chat(chat_request: ChatRequest):
             response = await client.post(
                 LMSTUDIO_CHAT_URL,
                 json=payload,
-                timeout=30.0  # 30 second timeout
+                timeout=30.0
             )
             
             if response.status_code != 200:
@@ -103,6 +118,34 @@ async def chat(chat_request: ChatRequest):
             
             response_data = response.json()
             assistant_message = response_data['choices'][0]['message']['content']
+
+            # Only save session if a session_id is provided
+            if chat_request.session_id and chat_request.session_id.strip():
+                try:
+                    print(f"Saving session {chat_request.session_id}")
+                    session = db.query(ChatSession).filter(ChatSession.id == chat_request.session_id).first()
+                    
+                    # Convert ChatMessage objects to dictionaries for storage
+                    history_dicts = [msg.dict() for msg in chat_request.history]
+                    new_messages = [
+                        {"role": "user", "content": chat_request.message},
+                        {"role": "assistant", "content": assistant_message}
+                    ]
+                    
+                    if not session:
+                        session = ChatSession(
+                            id=chat_request.session_id,
+                            history=history_dicts + new_messages
+                        )
+                        db.add(session)
+                    else:
+                        session.history = history_dicts + new_messages
+                    db.commit()
+                except Exception as e:
+                    # Log the error but don't fail the chat request
+                    print(f"Error saving session: {str(e)}")
+            else:
+                print("No session ID provided, not saving session.")
             
             return {"response": assistant_message}
             
