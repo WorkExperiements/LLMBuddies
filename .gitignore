@@ -401,3 +401,4 @@ FodyWeavers.xsd
 
 #virtual environment
 .venv312/*
+chat_sessions.db

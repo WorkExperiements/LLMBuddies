@@ -12,101 +12,22 @@
                 <option value="">Select a model...</option>
             </select>
         </div>
+        <div class="session-section">
+            <h3>Session Management (Optional)</h3>
+            <p class="session-info">Enter a session ID to save and restore your chat history</p>
+            <input type="text" id="session-id" placeholder="Enter session ID...">
+            <button onclick="loadSession()">Use Session</button>
+        </div>
     </div>
 
     <div id="chat-container">
         <div id="chat-messages"></div>
         <div>
             <input type="text" id="message-input" placeholder="Type your message...">
-            <button onclick="sendMessage()">Send</button>
+            <button id="send-button" onclick="sendMessage()">Send</button>
         </div>
     </div>
 
-    <script>
-        // Chat history storage
-        let chatHistory = [];
-
-        // Load available models when page loads
-        document.addEventListener('DOMContentLoaded', loadAvailableModels);
-
-        async function loadAvailableModels() {
-            try {
-                const response = await fetch('/models/configured');
-                const data = await response.json();
-                const modelSelect = document.getElementById('model-select');
-                
-                // Clear existing options except the first one
-                while (modelSelect.options.length > 1) {
-                    modelSelect.remove(1);
-                }
-
-                // Add new options
-                for (const [modelId, modelInfo] of Object.entries(data)) {
-                    const option = document.createElement('option');
-                    option.value = modelId;
-                    option.textContent = modelId;
-                    modelSelect.appendChild(option);
-                }
-            } catch (error) {
-                alert('Error loading available models: ' + error.message);
-            }
-        }
-
-        async function sendMessage() {
-            const messageInput = document.getElementById('message-input');
-            const modelSelect = document.getElementById('model-select');
-            const message = messageInput.value.trim();
-            const modelId = modelSelect.value;
-            
-            if (!message) return;
-            
-            if (!modelId) {
-                alert('Please select a model first');
-                return;
-            }
-            
-            // Add user message to chat and history
-            addMessageToChat('You: ' + message, 'user-message');
-            chatHistory.push({ role: 'user', content: message });
-            messageInput.value = '';
-
-            try {
-                const response = await fetch('/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        message: message,
-                        model_id: modelId,
-                        history: chatHistory
-                    })
-                });
-
-                const data = await response.json();
-                // Add assistant response to chat and history
-                addMessageToChat('Assistant: ' + data.response, 'assistant-message');
-                chatHistory.push({ role: 'assistant', content: data.response });
-            } catch (error) {
-                addMessageToChat('Error: ' + error.message, 'error-message');
-            }
-        }
-
-        function addMessageToChat(message, className) {
-            const chatMessages = document.getElementById('chat-messages');
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', className);
-            messageElement.textContent = message;
-            chatMessages.appendChild(messageElement);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Handle Enter key in message input
-        document.getElementById('message-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-    </script>
+    <script src="/static/chat.js"></script>
 </body>
 </html>
