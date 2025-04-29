@@ -1,7 +1,16 @@
 MODEL_CONFIGS = {
-    "llama-3.1-8b-lexi-a-v2":"D:\\cc\\GPT4All\\bartowski\\Llama-3.1-8B-Lexi-g-V2-GGUF\\Llama-3.1-8B-Lexi-g-V2-Q6_K_L.gguf",
-    "llama-3.2-1b-b_open_v_gguf": "D:\\cc\\GPT4All\\Novaciano\\Llama-3.2-1B-b_Open_v_GGUF\\Llama-3.2-1B-b_Open_v.gguf",
-    "mistral-7b-bstory-lora": "D:\\cc\\GPT4All\\hrtdind\\Mistral-7B-bSTORY-lora-GGUF\\Mistral-7B-bSTORY-q5_K_M.gguf"
+    "llama-3.1-8b-lexi-a-v2": {
+        "path": "D:\\cc\\GPT4All\\bartowski\\Llama-3.1-8B-Lexi-g-V2-GGUF\\Llama-3.1-8B-Lexi-g-V2-Q6_K_L.gguf",
+        "display_name": "Llama 3.1 (8B) - Lexi"
+    },
+    "llama-3.2-1b-b_open_v_gguf": {
+        "path": "D:\\cc\\GPT4All\\Novaciano\\Llama-3.2-1B-b_Open_v_GGUF\\Llama-3.2-1B-b_Open_v.gguf",
+        "display_name": "Llama 3.2 (1B)"
+    },
+    "mistral-7b-bstory-lora": {
+        "path": "D:\\cc\\GPT4All\\hrtdind\\Mistral-7B-bSTORY-lora-GGUF\\Mistral-7B-bSTORY-q5_K_M.gguf",
+        "display_name": "Mistral (7B) - Story"
+    }
 }
 
 # System message to shape the model's behavior
@@ -10,17 +19,21 @@ SYSTEM_MESSAGE = """You are a helpful AI assistant. """
 # Server configuration
 LMSTUDIO_HOST = "localhost"  # Change this to the IP address of the machine running LM Studio if needed
 LMSTUDIO_PORT = 1234
-APP_PORT = 8000
+APP_PORT = 8123
 
 def get_model_path(model_id: str) -> str:
     """Get the full path for a model ID"""
-    return MODEL_CONFIGS.get(model_id)
+    return MODEL_CONFIGS[model_id]["path"]
 
 def get_available_models() -> dict:
     """Get all available model configurations"""
     return {
-        model_id: {"id": model_id, "path": path}
-        for model_id, path in MODEL_CONFIGS.items()
+        model_id: {
+            "id": model_id,
+            "display_name": config["display_name"],
+            "path": config["path"]
+        }
+        for model_id, config in MODEL_CONFIGS.items()
     }
 
 def get_system_message() -> str:

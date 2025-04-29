@@ -6,17 +6,21 @@
 </head>
 <body>
     <div id="model-controls">
-        <div class="model-section">
-            <h3>Model Selection</h3>
-            <select id="model-select">
-                <option value="">Select a model...</option>
-            </select>
-        </div>
-        <div class="session-section">
-            <h3>Session Management (Optional)</h3>
-            <p class="session-info">Enter a session ID to save and restore your chat history</p>
-            <input type="text" id="session-id" placeholder="Enter session ID...">
-            <button onclick="loadSession()">Use Session</button>
+        <div id="settings-header" class="collapsible">Settings</div>
+        <div class="collapsible-content">
+            <div class="model-section">
+                <h3>Model Selection</h3>
+                <select id="model-select">
+                    <option value="">Select a model...</option>
+                </select>
+            </div>
+            <div class="session-section">
+                <h3>Session Management (Optional)</h3>
+                <p class="session-info">Enter a session ID to save and restore your chat history</p>
+                <input type="text" id="session-id" placeholder="Enter session ID...">
+                <button onclick="loadSession()">Load Session</button>
+                <button onclick="clearSession()">Clear Session</button>
+            </div>
         </div>
     </div>
 

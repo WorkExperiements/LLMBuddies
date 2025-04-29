@@ -100,3 +100,33 @@ button:disabled {
     background-color: white;
     font-size: 14px;
 }
+
+.collapsible {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #e9ecef;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+.collapsible:after {
+    content: '\25BC';
+    font-size: 13px;
+}
+
+.collapsible.collapsed:after {
+    content: '\25B6';
+}
+
+.collapsible-content {
+    max-height: 1000px;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.collapsible-content.collapsed {
+    max-height: 0;
+}
