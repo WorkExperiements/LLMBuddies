@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from sqlalchemy.orm import Session
 from database import get_db, ChatSession
+from buddies.src.buddies.crew import Buddies
 import json
 from config import (
     get_available_models, 
@@ -157,10 +158,24 @@ async def chat(chat_request: ChatRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(
-        "main:app", 
-        host="192.168.0.247", 
-        port=get_app_port(), 
-        reload=True
-    )
+    # Testing the crew
+    inputs = {
+        'topic': 'AI LLMs',
+        'current_year': str(2023)
+    }
+    
+    try:
+        Buddies().crew().kickoff(inputs=inputs)
+    except Exception as e:
+        raise Exception(f"An error occurred while running the crew: {e}")
+    
+    # # the web server
+    # import uvicorn
+    # uvicorn.run(
+    #     "main:app", 
+    #     host="192.168.0.247", 
+    #     port=get_app_port(), 
+    #     reload=True
+    # )
+
+    
