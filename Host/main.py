@@ -86,96 +86,72 @@ async def chat(chat_request: ChatRequest, db: Session = Depends(get_db)):
         if not chat_request.model_id:
             raise HTTPException(status_code=400, detail="Model ID must be provided")
         
-        # Start with system message
-        messages = [{"role": "system", "content": get_system_message()}]
+        # Create a context message that includes the conversation history
+        context = "\n".join([
+            f"{msg.role}: {msg.content}" 
+            for msg in chat_request.history
+        ])
+        context += f"\nuser: {chat_request.message}"
         
-        # Add conversation history
-        messages.extend([msg.dict() for msg in chat_request.history])
-        
-        # Add new message
-        messages.append({"role": "user", "content": chat_request.message})
-        
-        # Prepare the request for LMStudio API
-        payload = {
-            "messages": messages,
-            "temperature": 0.7,
-            "stream": False,
-            "model": chat_request.model_id
+        # Create a chat task and get response from CrewAI
+        inputs = {
+            "user_input": context,
         }
+        chat_crew = Buddies().crew().kickoff(inputs=inputs)
+        assistant_message = chat_crew.raw
+        print(f"Assistant message: {assistant_message}")
         
-        # Make request to LMStudio
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                LMSTUDIO_CHAT_URL,
-                json=payload,
-                timeout=30.0
-            )
+        # Only save session if a session_id is provided
+        if chat_request.session_id and chat_request.session_id.strip():
+            try:
+                print(f"Saving session {chat_request.session_id}")
+                session = db.query(ChatSession).filter(ChatSession.id == chat_request.session_id).first()
+                
+                # Convert ChatMessage objects to dictionaries for storage
+                history_dicts = [msg.dict() for msg in chat_request.history]
+                new_messages = [
+                    {"role": "user", "content": chat_request.message},
+                    {"role": "assistant", "content": assistant_message}
+                ]
+                
+                if not session:
+                    session = ChatSession(
+                        id=chat_request.session_id,
+                        history=history_dicts + new_messages
+                    )
+                    db.add(session)
+                else:
+                    session.history = history_dicts + new_messages
+                db.commit()
+            except Exception as e:
+                # Log the error but don't fail the chat request
+                print(f"Error saving session: {str(e)}")
+        else:
+            print("No session ID provided, not saving session.")
             
-            if response.status_code != 200:
-                raise HTTPException(
-                    status_code=response.status_code,
-                    detail=f"LMStudio API error: {response.text}"
-                )
+        return {"response": assistant_message}
             
-            response_data = response.json()
-            assistant_message = response_data['choices'][0]['message']['content']
-
-            # Only save session if a session_id is provided
-            if chat_request.session_id and chat_request.session_id.strip():
-                try:
-                    print(f"Saving session {chat_request.session_id}")
-                    session = db.query(ChatSession).filter(ChatSession.id == chat_request.session_id).first()
-                    
-                    # Convert ChatMessage objects to dictionaries for storage
-                    history_dicts = [msg.dict() for msg in chat_request.history]
-                    new_messages = [
-                        {"role": "user", "content": chat_request.message},
-                        {"role": "assistant", "content": assistant_message}
-                    ]
-                    
-                    if not session:
-                        session = ChatSession(
-                            id=chat_request.session_id,
-                            history=history_dicts + new_messages
-                        )
-                        db.add(session)
-                    else:
-                        session.history = history_dicts + new_messages
-                    db.commit()
-                except Exception as e:
-                    # Log the error but don't fail the chat request
-                    print(f"Error saving session: {str(e)}")
-            else:
-                print("No session ID provided, not saving session.")
-            
-            return {"response": assistant_message}
-            
-    except httpx.TimeoutException:
-        raise HTTPException(status_code=504, detail="LMStudio request timed out")
-    except httpx.HTTPError as e:
-        raise HTTPException(status_code=502, detail=f"Error communicating with LMStudio: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise e
 
 if __name__ == "__main__":
-    # Testing the crew
-    inputs = {
-        'topic': 'AI LLMs',
-        'current_year': str(2023)
-    }
+# # Testing the crew
+    # inputs = {
+    #     'topic': 'AI LLMs',
+    #     'current_year': str(2023)
+    # }
     
-    try:
-        Buddies().crew().kickoff(inputs=inputs)
-    except Exception as e:
-        raise Exception(f"An error occurred while running the crew: {e}")
+    # try:
+    #     Buddies().crew().kickoff(inputs=inputs)
+    # except Exception as e:
+    #     raise Exception(f"An error occurred while running the crew: {e}")
     
-    # # the web server
-    # import uvicorn
-    # uvicorn.run(
-    #     "main:app", 
-    #     host="192.168.0.247", 
-    #     port=get_app_port(), 
-    #     reload=True
-    # )
+    # the web server
+    import uvicorn
+    uvicorn.run(
+        "main:app", 
+        host="0.0.0.0", 
+        port=get_app_port(), 
+        reload=True
+    )
 
-    

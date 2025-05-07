@@ -2,13 +2,10 @@ from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from typing import List
-# If you want to run a snippet of code before or after the crew starts,
-# you can use the @before_kickoff and @after_kickoff decorators
-# https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
 
 @CrewBase
 class Buddies():
-    """Buddies crew"""
+    """Buddies crew for general conversation"""
 
     agents: List[BaseAgent]
     tasks: List[Task]
@@ -18,55 +15,39 @@ class Buddies():
         base_url="http://localhost:1234/v1",
         api_key="1234"
     )
-
-    # Learn more about YAML configuration files here:
-    # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
-    # Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
-    
-    # If you would like to add tools to your agents, you can learn more about it here:
-    # https://docs.crewai.com/concepts/agents#agent-tools
     @agent
-    def researcher(self) -> Agent:
+    def chatbot(self) -> Agent:
         return Agent(
-            config=self.agents_config['researcher'],
+            name="Chatbot",
+            role="A friendly and knowledgeable AI assistant that can engage in general conversation.",
+            goal="To engage in helpful conversation with the user.",
+            backstory="I am an AI assistant with broad knowledge across many topics. I aim to be helpful while being clear about my capabilities and limitations.",
             verbose=True,
-            llm=self.modelToUse
-        )
-
-    @agent
-    def reporting_analyst(self) -> Agent:
-        return Agent(
-            config=self.agents_config['reporting_analyst'],
-            verbose=True,
-            llm=self.modelToUse
-        )
-
-    # To learn more about structured task outputs,
-    # task dependencies, and task callbacks, check out the documentation:
-    # https://docs.crewai.com/concepts/tasks#overview-of-a-task
-    @task
-    def research_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['research_task'], # type: ignore[index]
+            llm=self.modelToUse,
+            allow_delegation=False  # Since this is a single agent setup
         )
 
     @task
-    def reporting_task(self) -> Task:
+    def chat_task(self) -> Task:
         return Task(
-            config=self.tasks_config['reporting_task'], # type: ignore[index]
-            output_file='report.md'
+            config=self.tasks_config['chat_task'] # type: ignore[index]
         )
+        # return Task(
+        #     description="""
+        #         Engage in conversation with the user and provide helpful responses to the user input based on existing conversation history from -- {user_input}.
+        #     """,
+        #     expected_output="""
+        #         the Assistant response to the user message based on this conversation history -- {user_input}.
+        #     """,
+        #     agent=self.chatbot()
+        # )
 
     @crew
     def crew(self) -> Crew:
-        """Creates the Buddies crew"""
-        # To learn how to add knowledge sources to your crew, check out the documentation:
-        # https://docs.crewai.com/concepts/knowledge#what-is-knowledge
-
+        """Creates a single-agent crew for chat interactions"""
         return Crew(
-            agents=self.agents, # Automatically created by the @agent decorator
-            tasks=self.tasks, # Automatically created by the @task decorator
+            agents=[self.chatbot()],
+            tasks=[self.chat_task()],
             process=Process.sequential,
-            verbose=True,
-            # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
+            verbose=True
         )
