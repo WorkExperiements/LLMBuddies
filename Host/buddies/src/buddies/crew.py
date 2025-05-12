@@ -1,6 +1,7 @@
 from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
+from crewai_tools import ScrapeWebsiteTool
 from typing import List
 
 @CrewBase
@@ -15,6 +16,9 @@ class Buddies():
         base_url="http://localhost:1234/v1",
         api_key="1234"
     )
+
+    scraper = ScrapeWebsiteTool()
+
     @agent
     def chatbot(self) -> Agent:
         return Agent(
@@ -26,6 +30,7 @@ class Buddies():
             llm=self.modelToUse,
             allow_delegation=False  # Since this is a single agent setup
         )
+    
 
     @task
     def chat_task(self) -> Task:
@@ -42,6 +47,8 @@ class Buddies():
         #     agent=self.chatbot()
         # )
 
+    
+
     @crew
     def crew(self) -> Crew:
         """Creates a single-agent crew for chat interactions"""
@@ -51,3 +58,5 @@ class Buddies():
             process=Process.sequential,
             verbose=True
         )
+    
+    

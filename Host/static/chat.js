@@ -1,11 +1,13 @@
 // Chat history storage
 let chatHistory = [];
 let currentSessionId = null;
+let urlEnabled = false;
 
 // Load available models and setup collapsible when page loads
 document.addEventListener('DOMContentLoaded', () => {
     loadAvailableModels();
     setupCollapsible();
+    setupUrlToggle();
 });
 
 function setupCollapsible() {
@@ -17,6 +19,16 @@ function setupCollapsible() {
             content.classList.toggle('collapsed');
         });
     }
+}
+
+function setupUrlToggle() {
+    const urlToggle = document.getElementById('url-toggle');
+    const urlInputContainer = document.getElementById('url-input-container');
+    
+    urlToggle.addEventListener('change', function() {
+        urlEnabled = this.checked;
+        urlInputContainer.style.display = urlEnabled ? 'block' : 'none';
+    });
 }
 
 async function loadAvailableModels() {
@@ -107,25 +119,44 @@ async function sendMessage() {
     messageInput.value = '';
 
     try {
+        // Filter out any history items that don't have both role and content
+        const validHistory = chatHistory.filter(msg => msg.role && msg.content);
+        
+        const payload = { 
+            message: message,
+            model_id: modelId,
+            history: validHistory,
+            session_id: currentSessionId,
+            url_enabled: urlEnabled
+        };
+
+        // Add URL if enabled and provided
+        if (urlEnabled) {
+            const urlInput = document.getElementById('url-input');
+            if (urlInput.value.trim()) {
+                payload.url = urlInput.value.trim();
+            }
+        }
+
         const response = await fetch('/chat', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'text/plain'
             },
-            body: JSON.stringify({ 
-                message: message,
-                model_id: modelId,
-                history: chatHistory,
-                session_id: currentSessionId // This will be null if no session is active
-            })
+            body: JSON.stringify(payload)
         });
 
         const data = await response.json();
-        // Add assistant response to chat and history
-        addMessageToChat('Assistant: ' + data.response, 'assistant-message');
-        chatHistory.push({ role: 'assistant', content: data.response });
+        
+        // Only add assistant message to history if it has content
+        if (data.response) {
+            // Add assistant response to chat and history
+            addMessageToChat('Assistant: ' + data.response, 'assistant-message');
+            chatHistory.push({ role: 'assistant', content: data.response });
+        }
     } catch (error) {
         addMessageToChat('Error: ' + error.message, 'error-message');
+        console.log('Error:', error);
     } finally {
         // Re-enable send button and restore text
         sendButton.disabled = false;

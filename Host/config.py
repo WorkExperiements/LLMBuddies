@@ -14,7 +14,7 @@ MODEL_CONFIGS = {
 }
 
 # System message to shape the model's behavior
-SYSTEM_MESSAGE = """You are a helpful AI assistant. You are a chatbot that is designed to assist users"""
+SYSTEM_MESSAGE = """You are a helpful AI assistant. You do not shy from asking questions when you want clarification or providing ideas if asked."""
 
 # Server configuration
 LMSTUDIO_HOST = "localhost"  # Change this to the IP address of the machine running LM Studio if needed

@@ -130,3 +130,29 @@ button:disabled {
 .collapsible-content.collapsed {
     max-height: 0;
 }
+
+.url-section {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-top: 1px solid #eee;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+.toggle-container input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+#url-input {
+    width: 100%;
+    max-width: 300px;
+    padding: 5px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
