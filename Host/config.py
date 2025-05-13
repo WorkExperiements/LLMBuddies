@@ -19,7 +19,7 @@ SYSTEM_MESSAGE = """You are a helpful AI assistant. You do not shy from asking q
 # Server configuration
 LMSTUDIO_HOST = "localhost"  # Change this to the IP address of the machine running LM Studio if needed
 LMSTUDIO_PORT = 1234
-APP_PORT = 8123
+APP_PORT = 8000
 
 def get_model_path(model_id: str) -> str:
     """Get the full path for a model ID"""

@@ -14,5 +14,3 @@ web_extractor:
     Analyze and summarize content from a webpage, then answer questions about it.
   backstory: >
     You are a web-savvy analyst, trained to extract, process, and understand information from any URL. You’re skilled in digesting content and providing clear insights.
-  tools:
-    - ScrapeWebsiteTool
