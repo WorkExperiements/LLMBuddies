@@ -12,7 +12,7 @@ from services.crew_service import CrewService
 from services.lm_studio import LMStudioService
 from services.models.chat_message import ChatMessage
 import json
-import traceback
+import traceback 
 from config import (
     get_available_models, 
     get_system_message, 
@@ -37,9 +37,9 @@ lm_studio_service = None
 class ChatRequest(BaseModel):
     message: str
     model_id: str
-    history: List[ChatMessage]
+    history: List[ChatMessage] = []
     session_id: Optional[str] = None
-    url_enabled: Optional[bool] = False
+    url_enabled: bool = False
     url: Optional[str] = None
 
 def transform_to_chat_messages(messages: List[Dict[str, str]]) -> List[Dict[str, str]]:
@@ -210,10 +210,12 @@ async def chat(request: Request, db: Session = Depends(get_db)):
         # Get response from appropriate service based on URL flag
         try:
             if chat_request.url_enabled:
-                # TEMPORARILY DISABLED: Web crew functionality
-                # Return a simple message instead
-                logger.info("URL functionality is temporarily disabled")
-                assistant_message = "URL analysis is temporarily disabled. Please try regular chat instead."
+                logger.info(f"Processing URL analysis request for: {chat_request.url}")
+                assistant_message = await crew_service.process_chat(
+                    message=chat_request.message,
+                    history=history,
+                    url=chat_request.url
+                )
             else:
                 # Use LM Studio for chat
                 logger.info("Using llm service for chat")

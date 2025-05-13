@@ -2,15 +2,4 @@ chat_task:
   description: Generate your response to the user input based on existing conversation history as shown after the double dashes -- {user_input}.
   expected_output: Only your response to the user based on the conversation history. It should not contain previous chat history. The chat history to use is as shown after the double dashes -- {user_input}.
   agent: chatbot
-
-analyze_webpage_task:
-  description: >
-    Go to the URL provided and extract its main content. Once extracted, analyze the content to answer the following question:
-
-    URL: {url}
-    Question: {question}
-
-    Your final answer MUST be clear, specific, and directly supported by the page content. If the page does not contain relevant information, you should say that the page does not contain relevant information.
-  expected_output: >
-    A concise answer to the question based on the page's content.
-  agent: webAnalyzer
+  

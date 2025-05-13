@@ -5,7 +5,7 @@ from crewai_tools import ScrapeWebsiteTool
 from typing import List
 
 @CrewBase
-class Buddies():
+class ChatCrew():
     """Buddies crew for general conversation"""
 
     agents: List[BaseAgent]
