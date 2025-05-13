@@ -1,9 +1,10 @@
 analyze_webpage_task:
   description: >
-    Go to the URL provided and extract its main content. Once extracted, analyze the content to answer the following question:
-
-    URL: {url}
-    Question: {question}
+    Go to the following URL: 
+    {url}
+    
+    Scrape its content. Once extracted, analyze the content to answer the following question:
+    {question}
 
     Your final answer MUST be clear, specific, and directly supported by the page content. If the page does not contain relevant information, you should say that the page does not contain relevant information.
   expected_output: >

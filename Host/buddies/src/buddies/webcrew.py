@@ -28,7 +28,8 @@ class WebCrew():
   @tool
   def scrape_website_tool(self) -> ScrapeWebsiteTool:
       """Get the tool for scraping websites"""
-      return ScrapeWebsiteTool(website_url=self._website_url)
+      #return ScrapeWebsiteTool(website_url=self._website_url)
+      return ScrapeWebsiteTool()
 
   @agent
   def web_extractor(self) -> Agent:
