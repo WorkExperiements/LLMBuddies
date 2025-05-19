@@ -1,3 +1,7 @@
+import os
+# dummy import to avoid import errors
+os.environ['OPENAI_API_KEY'] = "1234"  # or "lm-studio" or any dummy key
+
 import warnings
 # Filter out specific warning types
 warnings.filterwarnings("ignore", 
@@ -112,7 +116,7 @@ async def lifespan(app: FastAPI):
     if crew_service:
         crew_service.cleanup()
     if lm_studio_service:
-        await lm_studio_service.close()
+        lm_studio_service.close()
 
 app = FastAPI(lifespan=lifespan)
 
@@ -151,7 +155,6 @@ async def chat(request: Request, db: Session = Depends(get_db)):
         try:
             chat_request = handle_payload(raw_payload)
         except json.JSONDecodeError:
-            # Print stack trace for JSON parsing errors
             print("JSON Parsing Error:", file=sys.stderr)
             traceback.print_exc()
             raise HTTPException(status_code=400, detail="Invalid JSON payload")
@@ -187,7 +190,8 @@ async def chat(request: Request, db: Session = Depends(get_db)):
                     {"role": "user", "content": chat_request.message}
                 ])
                 
-                assistant_message = await lm_studio_service.get_chat_completion(
+                # Use synchronous get_chat_completion
+                assistant_message = lm_studio_service.get_chat_completion(
                     messages=messages,
                     model_id=chat_request.model_id
                 )

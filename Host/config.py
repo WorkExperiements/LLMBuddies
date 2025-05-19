@@ -1,4 +1,16 @@
 MODEL_CONFIGS = {
+    "hermes-3-llama-3.1-8b":{
+        "path": "D:/cc/GPT4All/NousResearch/Hermes-3-Llama-3.1-8B-GGUF/Hermes-3-Llama-3.1-8B.Q4_K_M.gguf",
+        "display_name": "Hermes 3.1 (8B)"
+    },
+    "llama-3.1-8b-claude-3.7-sonnet-reasoning-distilled":{
+        "path": "D:/cc/GPT4All/reedmayhew/Llama-3.1-8B-claude-3.7-sonnet-reasoning-distilled/llama-3.1-8b-claude-3.7-sonnet-reasoning-distilled.Q4_0.gguf",
+        "display_name": "Llama 3.1 8b Claude - distilled"
+    },
+    "claude-3.7-sonnet-reasoning-gemma3-12b": {
+        "path":"D:\\cc\\GPT4All\\reedmayhew\\claude-3.7-sonnet-reasoning-gemma3-12B\\claude-3.7-sonnet-reasoning-gemma3-12B.Q8_0.gguf",
+        "display_name": "Claude 3.7 (12B)"
+    },
     "llama-3.1-8b-lexi-uncensored-v2": {
         "path": "D:\\cc\\GPT4All\\bartowski\\Llama-3.1-8B-Lexi-Uncensored-V2-GGUF\\Llama-3.1-8B-Lexi-Uncensored-V2-Q6_K_L.gguf",
         "display_name": "Llama 3.1 (8B) - Lexi"
@@ -12,6 +24,11 @@ MODEL_CONFIGS = {
         "display_name": "Mistral (7B) - Story"
     }
 }
+
+# Model ID to use for AI agents (like the web scraper summarizer)
+# For now hard code it to gpt, because of some system message issues.
+#AGENT_MODEL_ID = "hermes-3-llama-3.1-8b"
+AGENT_MODEL_ID = "gpt-3.5-turbo"
 
 # System message to shape the model's behavior
 SYSTEM_MESSAGE = """You are a helpful AI assistant. You do not shy from asking questions when you want clarification or providing ideas if asked."""

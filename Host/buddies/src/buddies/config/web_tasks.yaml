@@ -1,12 +1,15 @@
 analyze_webpage_task:
   description: >
-    Go to the following URL: 
-    {url}
-    
-    Scrape its content. Once extracted, analyze the content to answer the following question:
-    {question}
+    Use the available tool to scrape the content of the given URL and summarize it in plain language.
+    The tool ScrapeAndSummarizeTool returns both the full raw text and a short summary. You should store both values in memory.
+    If the tool fails for whatever reason, you should report the error to the user and finish the task without retrying.
+    If the tool returns a value that is not human readable, you should report the error to the user and finish the task without retrying.
 
-    Your final answer MUST be clear, specific, and directly supported by the page content. If the page does not contain relevant information, you should say that the page does not contain relevant information.
+    URL: {url}
   expected_output: >
-    A concise answer to the question based on the page's content.
+    A JSON-style string with keys "raw" and "summary" representing the extracted page content. Example:
+    {
+      "raw": "Full text of the webpage...",
+      "summary": "A short summary of the webpage..."
+    }
   agent: web_extractor

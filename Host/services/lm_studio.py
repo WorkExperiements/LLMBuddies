@@ -8,14 +8,14 @@ class LMStudioService:
     def __init__(self):
         self.base_url = get_lmstudio_base_url()
         self.chat_url = f"{self.base_url}/v1/chat/completions"
-        self.client = httpx.AsyncClient()
+        self.client = httpx.Client()
 
-    async def close(self):
+    def close(self):
         """Close the HTTP client"""
         if self.client:
-            await self.client.aclose()
+            self.client.close()
 
-    async def get_chat_completion(
+    def get_chat_completion(
         self,
         messages: List[Dict[str, str]],
         model_id: str,
@@ -61,10 +61,10 @@ class LMStudioService:
             payload["max_tokens"] = max_tokens
 
         # Make request to LM Studio
-        response = await self.client.post(
+        response = self.client.post(
             self.chat_url,
             json=payload,
-            timeout=30.0
+            timeout=240.0
         )
         
         if response.status_code != 200:
