@@ -26,16 +26,16 @@ class ScrapeAndSummarizeTool(BaseTool):
         summary = lm_studio.get_chat_completion(
             messages=[{
                 "role": "user", 
-                "content": f"Summarize the following website content, do not include any other information like acknowledgements:\n\n{raw_text[:1000]}"
+                "content": f"Summarize the following website content, do not include any other information like acknowledgements:\n\n{raw_text[:2000]}"
             }],
             model_id=AGENT_MODEL_ID
         )
 
         result = {
-            "raw": raw_text[:1000], 
+            "raw": raw_text[:2000], 
             "summary": summary
         }
 
         print(f"***** Tool executed successfully: {summary} ******")
 
-        return json.dumps(result, indent=2)
+        return json.dumps(result)

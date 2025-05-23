@@ -45,9 +45,15 @@ class CrewService:
         Returns:
             The assistant's response as a string
         """
+        #debug only
+        learn = True
+
         try:
             if url:
-                out_message =self._learn_website(url, message)
+                if learn:
+                    out_message = self._learn_website(url, message)
+                else:
+                    out_message = self._ask_about_website(url, message)
             else:
                 crew = self._get_chat_crew()
                 inputs = {
@@ -83,16 +89,47 @@ class CrewService:
         }
         print(f"Inputs for web crew: {inputs}")
         try:
-            result = crew.web_crew().kickoff(inputs=inputs)
+            result = crew.scraping_crew().kickoff(inputs=inputs)
         except Exception as crew_error:
             raise Exception(f"Web crew error: {str(crew_error)}")
         print("Crew result:", result.raw)
         print("Crew result length:", len(result.raw))
-        result_parsed =json.loads(result.raw)
-
-        self.memory_service.store_website_content(url, result_parsed["raw"], result_parsed["summary"])
+        
+        try:
+            result_parsed =json.loads(result.raw)
+            self.memory_service.store_website_content(url, result_parsed["raw"], result_parsed["summary"])
+        except Exception as e:
+            print("Error parsing JSON, result not saved:", e)
+            traceback.print_exc()
+            return f"Error parsing the result from the web crew."
+            
         return f"I’ve scraped and stored content from {url}. You can ask me about it later."
 
+    def _ask_about_website(self, url: str, question: str) -> str:
+        print(f"Answering question about website: {url}")
+        
+        memory = self.memory_service.get_website_content(url)
+        if not memory:
+            return f"I don’t have any stored content for {url}. Try learning it first."
+
+        combined_question = (
+            f"The user wants to know: '{question}'\n\n"
+            f"Here's the stored summary:\n{memory['summary']}\n\n"
+            f"And here’s the full raw content:\n{memory['raw'][:3000]}"
+        )
+
+        crew = self._get_web_crew(website_url=url)
+        inputs = {
+            "question": combined_question,
+            "url": url
+        }
+
+        try:
+            result = crew.qa_crew().kickoff(inputs=inputs)
+        except Exception as e:
+            raise Exception(f"QA crew error: {str(e)}")
+
+        return result.raw
 
     def cleanup(self):
         """Cleanup any resources if needed"""

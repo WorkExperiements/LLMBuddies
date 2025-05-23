@@ -32,18 +32,44 @@ class WebCrew():
             tools=[ScrapeAndSummarizeTool()],  # ✅ This is a callable function now
             allow_delegation=False
         )
+    
+    @agent
+    def memory_qa_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config['memory_qa_agent'],
+            verbose=True,
+            memory=True,
+            llm=self.modelToUse,
+            tools=[],  # We will add memory access logic or embedding later
+            allow_delegation=False
+        )
 
     @task
     def analyze_webpage_task(self) -> Task:
         return Task(
             config=self.tasks_config['analyze_webpage_task']
         )
+    
+    @task
+    def qa_from_memory_task(self) -> Task:
+        return Task(
+            config=self.tasks_config['qa_from_memory_task']
+        )
 
     @crew
-    def web_crew(self) -> Crew:
+    def scraping_crew(self) -> Crew:
         return Crew(
             agents=[self.web_extractor()],
             tasks=[self.analyze_webpage_task()],
+            process=Process.sequential,
+            verbose=True
+        )
+
+    @crew
+    def qa_crew(self) -> Crew:
+        return Crew(
+            agents=[self.memory_qa_agent()],
+            tasks=[self.qa_from_memory_task()],
             process=Process.sequential,
             verbose=True
         )
