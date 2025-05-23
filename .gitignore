@@ -403,3 +403,4 @@ FodyWeavers.xsd
 .venv312/*
 chat_sessions.db
 Host/report.md
+Host/website_memory.json

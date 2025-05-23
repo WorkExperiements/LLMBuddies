@@ -1,9 +1,12 @@
 analyze_webpage_task:
   description: >
     Use the available tool to scrape the content of the given URL and summarize it in plain language.
-    The tool ScrapeAndSummarizeTool returns both the full raw text and a short summary. You should store both values in memory.
-    If the tool fails for whatever reason, you should report the error to the user and finish the task without retrying.
-    If the tool returns a value that is not human readable, you should report the error to the user and finish the task without retrying.
+    This tool returns a machine-readable JSON string with two fields: "raw" and "summary".
+
+    IMPORTANT: You MUST return the output of the tool **exactly as received**.
+    Do not reword it, summarize it, or wrap it in natural language.
+
+    If the tool fails or produces unreadable output, explain the failure instead.
 
     URL: {url}
   expected_output: >
@@ -13,3 +16,19 @@ analyze_webpage_task:
       "summary": "A short summary of the webpage..."
     }
   agent: web_extractor
+
+
+qa_from_memory_task:
+  description: >
+    Use the previously stored content from this website to answer the following user question:
+
+    {question}
+
+    Be as specific and helpful as possible. Reference facts only from the known page content.
+    If you don't have enough information, say so.
+
+    Website: {url}
+  expected_output: >
+    A factual, helpful answer to the user's question based entirely on the content previously stored for the given website.
+    Be concise, but make sure to include supporting details when appropriate.
+  agent: memory_qa_agent
