@@ -75,16 +75,7 @@ class CrewService:
     def _learn_website(self, url: str, message: str) -> str:
         # Check if we've already stored this site
         print(f"Learning website: {url}")
-        existing = self.memory_service.get_website_content(url)
-        
-        if existing:
-            print("Content exists for url.")
-            return f"I’ve already stored content from {url}. You can ask me about it."
-        else:
-            print("Content does not exist for url.")
-
         # Scrape and summarize
-
         crew = self._get_web_crew(website_url=url)
         inputs = {
             "question": f"user: {message}",
