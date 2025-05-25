@@ -28,7 +28,7 @@ class CrewService:
         self._web_crew = WebCrew(website_url=website_url)
         return self._web_crew
 
-    async def process_chat(
+    def process_chat(
         self,
         message: str,
         history: str,
@@ -45,28 +45,31 @@ class CrewService:
         Returns:
             The assistant's response as a string
         """
-        #debug only
-        learn = True
-
+        
         try:
             if url:
-                if learn:
-                    out_message = self._learn_website(url, message)
-                else:
-                    out_message = self._ask_about_website(url, message)
+                # Website memory present?
+                memory = self.memory_service.get_website_content(url)
+
+                # Does user want to "learn" or "store" or "remember" the site?
+                if not memory and any(
+                    keyword in message.lower()
+                    for keyword in ["learn", "scrape", "store", "remember", "analyze"]
+                ):
+                    print("[Routing] Learning from website")
+                    return self._learn_website(url, message)
+
+                # Otherwise, assume they want to ask a question about it
+                print("[Routing] Answering a memory question")
+                return self._ask_about_website(url, message)
             else:
+                # No URL, just process the chat message
                 crew = self._get_chat_crew()
-                inputs = {
-                    "user_input": f"{history}\nuser: {message}"
-                }
-                try:
-                    result = crew.crew().kickoff(inputs=inputs)
-                    out_message = result.raw
-                except Exception as crew_error:
-                    raise Exception(f"Chat crew error: {str(crew_error)}")
-            return out_message
-            
+                inputs = { "user_input": f"{history}\nuser: {message}" }
+                result = crew.crew().kickoff(inputs=inputs)
+                return result.raw
         except Exception as e:
+            traceback.print_exc()
             raise Exception(f"Service: Error processing chat with crew: {str(e)}")
     
     def _learn_website(self, url: str, message: str) -> str:
