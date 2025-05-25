@@ -1,20 +1,23 @@
 analyze_webpage_task:
   description: >
-    Use the available tool to scrape the content of the given URL and summarize it in plain language.
+    Use the available tool to scrape the content of the given URL.
     This tool returns a machine-readable JSON string with two fields: "raw" and "summary".
 
     IMPORTANT: You MUST return the output of the tool **exactly as received**.
     Do not reword it, summarize it, or wrap it in natural language.
 
-    If the tool fails or produces unreadable output, explain the failure instead.
-
     URL: {url}
   expected_output: >
-    A JSON-style string with keys "raw" and "summary" representing the extracted page content. Example:
+    You MUST return the tool output exactly as it was returned.
+
+    The tool ScrapeAndSummarizeTool returns a valid JSON string that looks like this:
     {
-      "raw": "Full text of the webpage...",
-      "summary": "A short summary of the webpage..."
+      "raw": "...",
+      "summary": "..."
     }
+
+    Do NOT add any commentary, explanation, or surrounding text.
+    Just return the exact JSON string — nothing more.
   agent: web_extractor
 
 

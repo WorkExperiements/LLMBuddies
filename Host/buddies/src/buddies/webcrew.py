@@ -4,6 +4,7 @@ from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai_tools import ScrapeWebsiteTool
 from typing import List
 from buddies.src.buddies.tools.webscrapper_summarizer import ScrapeAndSummarizeTool
+from buddies.src.models.web_extraction_output import WebExtractionOutput
 from config import AGENT_MODEL_ID
 
 @CrewBase
@@ -47,7 +48,8 @@ class WebCrew():
     @task
     def analyze_webpage_task(self) -> Task:
         return Task(
-            config=self.tasks_config['analyze_webpage_task']
+            config=self.tasks_config['analyze_webpage_task'],
+            output_json=WebExtractionOutput
         )
     
     @task

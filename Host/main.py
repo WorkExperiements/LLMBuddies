@@ -1,6 +1,17 @@
 import os
-# dummy import to avoid import errors
-os.environ['OPENAI_API_KEY'] = "1234"  # or "lm-studio" or any dummy key
+import litellm
+from config import AGENT_MODEL_ID, get_agent_base_url
+# Having a hard time specifying the model on a per agent basis, so we set it globally
+os.environ['OPENAI_API_KEY'] = "999"  # or "lm-studio" or any dummy key
+os.environ['LITELLM_MODEL']=f"{AGENT_MODEL_ID}" # openai/gpt-3.5-turbo
+os.environ['LITELLM_API_BASE']=get_agent_base_url()#"http://localhost:1234/v1"
+litellm.model_cost = {
+    f"{AGENT_MODEL_ID}": {
+        "input_cost_per_token": 0.0,
+        "output_cost_per_token": 0.0
+    }
+}
+#litellm._turn_on_debug()
 
 import warnings
 # Filter out specific warning types
@@ -178,7 +189,7 @@ async def chat(request: Request, db: Session = Depends(get_db)):
         # Get response from appropriate service based on URL flag
         try:
             if chat_request.url_enabled:
-                assistant_message = await crew_service.process_chat(
+                assistant_message = crew_service.process_chat(
                     message=chat_request.message,
                     history=history,
                     url=chat_request.url

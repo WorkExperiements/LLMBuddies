@@ -8,6 +8,8 @@ import json
 from services.lm_studio import LMStudioService
 from config import AGENT_MODEL_ID
 
+MAX_CHARACTERS = 1500  # Maximum characters to summarize
+
 class ScrapeAndSummarizeInput(BaseModel):
     url: str = Field(..., description="The full URL of the website to scrape and summarize.")
 
@@ -26,13 +28,13 @@ class ScrapeAndSummarizeTool(BaseTool):
         summary = lm_studio.get_chat_completion(
             messages=[{
                 "role": "user", 
-                "content": f"Summarize the following website content, do not include any other information like acknowledgements:\n\n{raw_text[:2000]}"
+                "content": f"Summarize the following website content, do not include any other information like acknowledgements:\n\n{raw_text[:MAX_CHARACTERS]}"
             }],
             model_id=AGENT_MODEL_ID
         )
 
         result = {
-            "raw": raw_text[:2000], 
+            "raw": raw_text[:MAX_CHARACTERS], 
             "summary": summary
         }
 
