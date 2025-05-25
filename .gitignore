@@ -404,3 +404,5 @@ FodyWeavers.xsd
 chat_sessions.db
 Host/report.md
 Host/website_memory.json
+Host/website_memory.json
+replacements.txt
