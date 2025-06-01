@@ -11,16 +11,16 @@ MODEL_CONFIGS = {
         "path":"D:\\cc\\GPT4All\\reedmayhew\\claude-3.7-sonnet-reasoning-gemma3-12B\\claude-3.7-sonnet-reasoning-gemma3-12B.Q8_0.gguf",
         "display_name": "Claude 3.7 (12B)"
     },
-    "llama-3.1-8b-lexi-uncensored-v2": {
-        "path": "D:\\cc\\GPT4All\\bartowski\\Llama-3.1-8B-Lexi-Uncensored-V2-GGUF\\Llama-3.1-8B-Lexi-Uncensored-V2-Q6_K_L.gguf",
+    "llama-3.1-8b-lexi-a-v2": {
+        "path": "D:\\cc\\GPT4All\\bartowski\\Llama-3.1-8B-Lexi-g-V2-GGUF\\Llama-3.1-8B-Lexi-g-V2-Q6_K_L.gguf",
         "display_name": "Llama 3.1 (8B) - Lexi"
     },
-    "llama-3.2-1b-nsfw_open_erotic_gguf": {
-        "path": "D:\\cc\\GPT4All\\Novaciano\\Llama-3.2-1B-NSFW_Open_Erotic_GGUF\\Llama-3.2-1B-NSFW_Open_Erotic.gguf",
+    "llama-3.2-1b-b_open_v_gguf": {
+        "path": "D:\\cc\\GPT4All\\Novaciano\\Llama-3.2-1B-b_Open_v_GGUF\\Llama-3.2-1B-b_Open_v.gguf",
         "display_name": "Llama 3.2 (1B)"
     },
-    "mistral-7b-nsfwstory-lora": {
-        "path": "D:\\cc\\GPT4All\\hrtdind\\Mistral-7B-NSFWSTORY-lora-GGUF\\Mistral-7B-NSFWSTORY-q5_K_M.gguf",
+    "mistral-7b-bstory-lora": {
+        "path": "D:\\cc\\GPT4All\\hrtdind\\Mistral-7B-bSTORY-lora-GGUF\\Mistral-7B-bSTORY-q5_K_M.gguf",
         "display_name": "Mistral (7B) - Story"
     }
 }

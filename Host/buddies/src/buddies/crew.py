@@ -12,7 +12,7 @@ class ChatCrew():
     tasks: List[Task]
 
     modelToUse = LLM(
-        model="openai/llama-3.1-8b-lexi-uncensored-v2",
+        model="openai/llama-3.1-8b-lexi-a-v2",
         base_url="http://localhost:1234/v1",
         api_key="1234"
     )
