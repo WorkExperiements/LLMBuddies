@@ -64,3 +64,7 @@ def get_lmstudio_base_url() -> str:
 def get_app_port() -> int:
     """Get the port for the web application"""
     return APP_PORT
+
+def get_agent_base_url() ->str:
+    """Get the base URL for the agent API"""
+    return f"http://{LMSTUDIO_HOST}:{LMSTUDIO_PORT}/v1"

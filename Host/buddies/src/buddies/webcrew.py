@@ -4,8 +4,10 @@ from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai_tools import ScrapeWebsiteTool
 from typing import List
 from buddies.src.buddies.tools.webscrapper_summarizer import ScrapeAndSummarizeTool
+from buddies.src.buddies.tools.memory_lookup_tool import MemoryLookupTool
 from buddies.src.models.web_extraction_output import WebExtractionOutput
-from config import AGENT_MODEL_ID
+from config import AGENT_MODEL_ID, get_agent_base_url 
+
 
 @CrewBase
 class WebCrew():
@@ -19,7 +21,7 @@ class WebCrew():
         self._website_url = website_url
         self.modelToUse = LLM(
             model=f"{AGENT_MODEL_ID}",
-            base_url="http://localhost:1234/v1",
+            base_url=f"{get_agent_base_url()}",#http://localhost:1234/v1",
             api_key="1234"
         )
 
@@ -41,7 +43,7 @@ class WebCrew():
             verbose=True,
             memory=True,
             llm=self.modelToUse,
-            tools=[],  # We will add memory access logic or embedding later
+            tools=[MemoryLookupTool()],
             allow_delegation=False
         )
 

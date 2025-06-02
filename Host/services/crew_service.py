@@ -3,6 +3,7 @@ import traceback
 from buddies.src.buddies.crew import ChatCrew
 from buddies.src.buddies.webcrew import WebCrew
 from services.memory_store_service import MemoryStoreService
+from litellm import completion
 import json
 
 class CrewService:
@@ -63,7 +64,7 @@ class CrewService:
                 print("[Routing] Answering a memory question")
                 return self._ask_about_website(url, message)
             else:
-                # No URL, just process the chat message
+                # No URL, just process the chat message ; ACTUALLY not possible because of logic.
                 crew = self._get_chat_crew()
                 inputs = { "user_input": f"{history}\nuser: {message}" }
                 result = crew.crew().kickoff(inputs=inputs)
@@ -102,19 +103,9 @@ class CrewService:
     def _ask_about_website(self, url: str, question: str) -> str:
         print(f"Answering question about website: {url}")
         
-        memory = self.memory_service.get_website_content(url)
-        if not memory:
-            return f"I don’t have any stored content for {url}. Try learning it first."
-
-        combined_question = (
-            f"The user wants to know: '{question}'\n\n"
-            f"Here's the stored summary:\n{memory['summary']}\n\n"
-            f"And here’s the full raw content:\n{memory['raw'][:3000]}"
-        )
-
         crew = self._get_web_crew(website_url=url)
         inputs = {
-            "question": combined_question,
+            "question": question,
             "url": url
         }
 

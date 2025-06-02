@@ -23,15 +23,14 @@ analyze_webpage_task:
 
 qa_from_memory_task:
   description: >
-    Use the previously stored content from this website to answer the following user question:
+    Use the MemoryLookupTool to retrieve stored content for the website at {url}.
+
+    Once you have the memory, answer the following user question:
 
     {question}
 
-    Be as specific and helpful as possible. Reference facts only from the known page content.
-    If you don't have enough information, say so.
-
-    Website: {url}
+    If the tool does not return any memory, say so and end the task.
   expected_output: >
     A factual, helpful answer to the user's question based entirely on the content previously stored for the given website.
-    Be concise, but make sure to include supporting details when appropriate.
+    Be concise, only answer the question without including the stored contents.
   agent: memory_qa_agent
